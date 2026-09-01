@@ -59,19 +59,78 @@ section h3 {
 
 .activity-card {
   margin-bottom: 15px;
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  background-color: #f9f9f9;
+  padding: 18px 16px;
+  border: 1px solid #dfe3f0;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #ffffff 0%, #f7f9ff 100%);
+  box-shadow: 0 6px 18px rgba(26, 35, 126, 0.08);
 }
 
 .activity-card h4 {
   margin-bottom: 10px;
   color: #0066cc;
+  font-size: 1.3rem;
 }
 
 .activity-card p {
   margin-bottom: 8px;
+}
+
+.availability {
+  color: #1a237e;
+  font-weight: 600;
+}
+
+.participants-section {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #e1e7f5;
+}
+
+.participants-section h5 {
+  margin-bottom: 8px;
+  color: #1a237e;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.participants-list {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-left: 0;
+  margin: 0;
+}
+
+.participant-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #e8f0ff;
+  color: #173a8a;
+  border: 1px solid #bfd3ff;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.delete-participant {
+  background: transparent;
+  border: none;
+  color: #c62828;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0;
+  line-height: 1;
+}
+
+.participant-item.empty {
+  background: #f3f4f6;
+  color: #6b7280;
+  border-color: #e5e7eb;
 }
 
 .form-group {
@@ -142,3 +201,17 @@ footer {
   padding: 20px;
   color: #666;
 }
+
+@app.delete("/activities/{activity_name}/signup")
+def unregister_for_activity(activity_name: str, email: str):
+    """Remove a student from an activity"""
+    if activity_name not in activities:
+        raise HTTPException(status_code=404, detail="Activity not found")
+
+    activity = activities[activity_name]
+
+    if email not in activity["participants"]:
+        raise HTTPException(status_code=404, detail="Student is not registered for this activity")
+
+    activity["participants"].remove(email)
+    return {"message": f"Removed {email} from {activity_name}"}
